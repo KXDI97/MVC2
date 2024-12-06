@@ -1,0 +1,8 @@
+﻿<form id="logoutForm" class="px-4 py-3" action="@Url.Action("Logout","Home")" method="post">
+    @Html.AntiForgeryToken()
+
+    <label class="mb-2" style="color: white">Bienvenido: @User.Identity.Name.ToString()</label>
+    <a href="#" class="btn btn-link" onclick="document.getElementById('logoutForm').submit(); return false;">
+        Cerrar Sesión
+    </a>
+</form>

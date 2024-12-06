@@ -1,0 +1,28 @@
+﻿﻿@model MVC2.Models.LoginViewModel
+
+<form class="px-4 py-3" action="@Url.Action("Login","Home")" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Correo, new { @class = "form-label" })
+        @Html.TextBoxFor(m => m.Correo, new { @class = "form-control", @placeholder = "correo@ejemplo.com" })
+        @Html.ValidationMessageFor(m => m.Correo, "", new { @class = "text-danger" })
+    </div>
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Clave, new { @class = "form-label" })
+        @Html.TextBoxFor(m => m.Clave, new { @class = "form-control", @placeholder = "Contraseña" })
+        @Html.ValidationMessageFor(m => m.Clave, "", new { @class = "text-danger" })
+    </div>
+    <br />
+    <button type="submit" class="btn btn-info">Iniciar Sesión</button>
+</form>
+@if (TempData["AlertMessage"] != null)
+{
+    <div class="alert alert-danger mt-3">
+        <strong>Atención!</strong>
+        <br />
+        @TempData["AlertMessage"]
+    </div>
+}
+<div class="dropdown-divider"></div>
+<a class="dropdown-item" href="@Url.Action("Create", "Usuario")">No tienes cuenta? Registrate </a>
