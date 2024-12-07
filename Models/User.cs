@@ -26,7 +26,7 @@ namespace MVC2.Models
         [Required(ErrorMessage = " Este campo es obligaorio")]
         public DateTime Creation_Date { get; set; } = DateTime.Now;
 
-        public byte[] HashKey { get; set; } = Array.Empty<byte>();
-        public byte[] HashIV { get; set; } = Array.Empty<byte>();
+        public byte[] HashKey { get; set; } 
+        public byte[] HashIV { get; set; } 
     }
 }

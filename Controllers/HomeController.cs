@@ -8,29 +8,57 @@ using System.Web.Mvc;
 using System.Web.Security;
 using MVC2.Services;
 using MVC2.Security;
+using MVC2.Context;
 
 namespace MVC2.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly WebMVC2Context db = new WebMVC2Context();
+        private readonly PasswordEncripter encripter = new PasswordEncripter();
         private readonly IAuthorizationService _authService = new AuthorizationService();
+
         public ActionResult Index()
         {
             return View();
         }
 
-        public ActionResult About()
+        public ActionResult Login(LoginViewModel model)
         {
-            ViewBag.Message = "Your application description page.";
+            if (!ModelState.IsValid)
+            {
+                TempData["AlertMessage"] = "Datos de inicio de sesión inválidos.";
+                return RedirectToAction("Index");
+            }
 
-            return View();
-        }
+            // Usamos el servicio de autorización para validar al usuario
+            AuthResults result = _authService.Auth(model.Username, model.Password, out User user);
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
+            switch (result)
+            {
+                case AuthResults.Success:
+                    // Si es exitoso, actualizamos la cookie y redirigimos
+                    CookieUpdate(user);
+                    return RedirectToAction("Index", "Home");
 
-            return View();
+                case AuthResults.PasswordNotMatch:
+                    TempData["AlertMessage"] = "La contraseña es incorrecta.";
+                    break;
+
+                case AuthResults.NotExists:
+                    TempData["AlertMessage"] = "El usuario no existe.";
+                    break;
+
+                case AuthResults.Error:
+                default:
+                    TempData["AlertMessage"] = "Ocurrió un error al procesar la solicitud.";
+                    break;
+            }
+
+            // Redirigir al inicio en caso de error
+            return RedirectToAction("Index");
+
+            
         }
 
         public ActionResult LoginPartial()
@@ -38,33 +66,7 @@ namespace MVC2.Controllers
             return PartialView("LoginPartial");
         }
 
-        public ActionResult Login(LoginViewModel model)
-        {
-            string returnUrl = Url.Action("Index", "Home");
-
-            if (!ModelState.IsValid)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            User users = new User();
-            var result = _authService.Auth(model.Correo, model.Clave, out User user);
-            switch (result)
-            {
-                case AuthResults.Success:
-                    CookieUpdate(user);
-                    // Redirigir a la pantalla de creación de usuario
-                    return RedirectToAction("Create", "Users");
-                case AuthResults.PasswordNotMatch:
-                    TempData["AlertMessage"] = "La Contrasena es incorrecta.";
-                    return RedirectToAction("Index", "Home");
-                case AuthResults.NotExists:
-                    TempData["AlertMessage"] = "El usuario no existe.";
-                    return RedirectToAction("Index", "Home");
-                default:
-                    return RedirectToAction("Index", "Home");
-            }
-        }
+        
         public ActionResult LogoutPartial()
         {
             return PartialView("LogoutPartial");
@@ -88,7 +90,7 @@ namespace MVC2.Controllers
                 return Json(new { Message = "" }, JsonRequestBehavior.AllowGet);
             }
             User users = new User(); ;
-            var result = _authService.Auth(model.Correo, model.Clave, out User user);
+            var result = _authService.Auth(model.Username, model.Password, out User user);
             switch (result)
             {
                 case AuthResults.Success:

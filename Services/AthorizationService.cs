@@ -10,33 +10,44 @@ namespace MVC2.Services
 {
     public class AuthorizationService : IAuthorizationService
     {
-        private readonly WebMVC2Context db = new WebMVC2Context();
-        private readonly IPasswordEncripter _passordEncripter = new PasswordEncripter();
         
+        private readonly WebMVC2Context db = new WebMVC2Context();
+        private readonly IPasswordEncripter _passwordEncripter = new PasswordEncripter();
+
         public AuthResults Auth(string username, string password, out User users)
         {
             // Busca al usuario en la base de datos por su nombre de usuario
-            users = db.Users.Where(x => x.Username.Equals(username)).FirstOrDefault();
+            users = db.Users.FirstOrDefault(x => x.Username.Equals(username));
 
             // Si el usuario no existe, retorna el resultado correspondiente
             if (users == null)
-                return AuthResults.NotExists;
-
-            // Encripta la contraseña proporcionada usando las claves del usuario
-            password = _passordEncripter.Encript(password, new List<byte[]>
             {
-                users.HashKey, // Usa 'users' para acceder a las propiedades del usuario
-                users.HashIV
-            });
+                return AuthResults.NotExists;
+            }
 
-            // Compara la contraseña encriptada con la almacenada en la base de datos
-            if (password != users.Password)
-                return AuthResults.PasswordNotMatch;
+            // Desencriptar la contraseña usando PasswordEncripter
+            string decryptedPassword;
 
-            // Si todo está correcto, retorna éxito
-            return AuthResults.Success;
+            try
+            {
+                decryptedPassword = _passwordEncripter.Decript(users.Password, new List<byte[]> { users.HashKey, users.HashIV });
+            }
+            catch
+            {
+                return AuthResults.Error; // Error al desencriptar
+            }
+
+            // Comparar la contraseña desencriptada con la ingresada
+            if (decryptedPassword == password)
+            {
+                return AuthResults.Success;
+            }
+
+            // Si las contraseñas no coinciden
+            return AuthResults.PasswordNotMatch;
         }
-
-
     }
+
+
+    
 }

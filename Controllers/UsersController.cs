@@ -9,12 +9,15 @@ using System.Web;
 using System.Web.Mvc;
 using MVC2.Context;
 using MVC2.Models;
+using MVC2.Security;
 
 namespace MVC2.Controllers
 {
     public class UsersController : Controller
     {
         private WebMVC2Context db = new WebMVC2Context();
+        private readonly PasswordEncripter encripter = new PasswordEncripter();
+
 
         // GET: Users
         public ActionResult Index()
@@ -52,30 +55,34 @@ namespace MVC2.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Users.Add(user);
                 try
                 {
+                    // Encriptar la contraseña y generar las claves de encriptación
+                    var encryptedPassword = encripter.Encript(user.Password, out List<byte[]> hashes);
+                    user.Password = encryptedPassword;
+                    user.HashKey = hashes[0];
+                    user.HashIV = hashes[1];
+
+                    // Guardar el usuario en la base de datos
+                    db.Users.Add(user);
                     db.SaveChanges();
-                    return RedirectToAction("Index");
+
+                    TempData["SuccessMessage"] = "Usuario creado exitosamente.";
+                    return RedirectToAction("Index", "Home");
                 }
-                catch (DbEntityValidationException ex)
+                catch (Exception ex)
                 {
-                    foreach (var validationError in ex.EntityValidationErrors)
-                    {
-                        foreach (var error in validationError.ValidationErrors)
-                        {
-                            // Agrega los errores al ModelState para mostrarlos en la vista
-                            ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-                        }
-                    }
+                    ModelState.AddModelError("", "Error al crear el usuario: " + ex.Message);
                 }
             }
+
+            return View(user);
             // Para depuración: mostrar errores si el modelo no es válido
             foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
             {
                 Console.WriteLine(error.ErrorMessage);
             }
-            return View(user);
+            
         }
 
         // GET: Users/Edit/5

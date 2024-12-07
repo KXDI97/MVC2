@@ -9,7 +9,7 @@ namespace MVC2.Services
 {
     public interface IAuthorizationService
     {
-        AuthResults Auth(string user, string password, out User users);
+        AuthResults Auth(string Username, string password, out User users);
     }
 
     public enum AuthResults

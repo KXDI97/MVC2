@@ -4,14 +4,14 @@
     @Html.AntiForgeryToken()
 
     <div class="mb-3">
-        @Html.LabelFor(m => m.Correo, new { @class = "form-label" })
-        @Html.TextBoxFor(m => m.Correo, new { @class = "form-control", @placeholder = "correo@ejemplo.com" })
-        @Html.ValidationMessageFor(m => m.Correo, "", new { @class = "text-danger" })
+        @Html.LabelFor(m => m.Username, new { @class = "form-label" })
+        @Html.TextBoxFor(m => m.Username, new { @class = "form-control", @placeholder = "correo@ejemplo.com" })
+        @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
     </div>
     <div class="mb-3">
-        @Html.LabelFor(m => m.Clave, new { @class = "form-label" })
-        @Html.TextBoxFor(m => m.Clave, new { @class = "form-control", @placeholder = "Contraseña" })
-        @Html.ValidationMessageFor(m => m.Clave, "", new { @class = "text-danger" })
+        @Html.LabelFor(m => m.Password, new { @class = "form-label" })
+        @Html.TextBoxFor(m => m.Password, new { @class = "form-control", @placeholder = "Contraseña" })
+        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
     </div>
     <br />
     <button type="submit" class="btn btn-info">Iniciar Sesión</button>
@@ -25,4 +25,4 @@
     </div>
 }
 <div class="dropdown-divider"></div>
-<a class="dropdown-item" href="@Url.Action("Create", "Usuario")">No tienes cuenta? Registrate </a>
+<a class="dropdown-item" href="@Url.Action("Create", "Users")">No tienes cuenta? Registrate </a>
