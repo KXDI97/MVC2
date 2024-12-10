@@ -30,7 +30,7 @@ namespace MVC2.Services
 
             try
             {
-                decryptedPassword = _passwordEncripter.Decript(users.Password, new List<byte[]> { users.HashKey, users.HashIV });
+                decryptedPassword = _passwordEncripter.Decrypt(users.Password, new List<byte[]> { users.HashKey, users.HashIV });
             }
             catch
             {

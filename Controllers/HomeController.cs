@@ -119,6 +119,22 @@ namespace MVC2.Controllers
             Response.AppendCookie(cookie);
         }
 
-       
+        public AuthResults Auth(string username, string password, out User user)
+        {
+            user = db.Users.FirstOrDefault(u => u.Username == username);
+            if (user == null)
+            {
+                return AuthResults.NotExists;
+            }
+
+            // Verifica si la contraseña coincide
+            var decryptedPassword = encripter.Decrypt(user.Password, new List<byte[]> { user.HashKey, user.HashIV });
+            if (decryptedPassword == password)
+            {
+                return AuthResults.Success;
+            }
+
+            return AuthResults.PasswordNotMatch;
+        }
     }
 }

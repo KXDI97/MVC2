@@ -10,7 +10,7 @@ namespace MVC2.Security
 {
     public class PasswordEncripter : IPasswordEncripter
     {
-        public string Decript(string value, List<byte[]> hash)
+        public string Decrypt(string value, List<byte[]> hash)
         {
             if (hash.Count < 2)
                 throw new ArgumentException("Se deben especificar 2 hash, para Key y IV");

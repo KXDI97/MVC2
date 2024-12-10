@@ -10,6 +10,6 @@ namespace MVC2.Security
     {
         string Encript(string value, out List<byte[]> hashes);
         string Encript(string value, List<byte[]> hashes);
-        string Decript(string value, List<byte[]> hash);
+        string Decrypt(string value, List<byte[]> hash);
     }
 }
